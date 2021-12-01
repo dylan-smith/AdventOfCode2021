@@ -645,6 +645,14 @@ namespace AdventOfCode
             }
         }
 
+        public static IEnumerable<IEnumerable<T>> Window<T>(this IEnumerable<T> list, int size)
+        {
+            for (var i = size - 1; i < list.Count(); i++)
+            {
+                yield return list.Skip(i - size + 1).Take(size);
+            }
+        }
+
         public static IEnumerable<T> ToList<T>(this T[,] a)
         {
             for (var x = a.GetLowerBound(0); x <= a.GetUpperBound(0); x++)
