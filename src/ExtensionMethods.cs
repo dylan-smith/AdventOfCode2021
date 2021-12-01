@@ -1785,7 +1785,7 @@ namespace AdventOfCode
             unchecked
             {
                 var hash = 19;
-                
+
                 foreach (var x in this)
                 {
                     hash = hash * 31 + x.GetHashCode();
