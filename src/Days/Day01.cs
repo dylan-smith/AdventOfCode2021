@@ -9,48 +9,17 @@ namespace AdventOfCode.Days
     {
         public override string PartOne(string input)
         {
-            var depths = input.Integers();
+            var depths = input.Integers().ToArray();
+            var count = depths.SelectWithIndex().Count(x => x.index > 0 && x.item > depths[x.index - 1]);
 
-            var cur = depths.First();
-
-            var increases = 0;
-
-            for (var i = 0; i < depths.Count(); i++)
-            {
-                if (depths.ElementAt(i) > cur)
-                {
-                    increases++;
-                }
-
-                cur = depths.ElementAt(i);
-            }
-
-            return increases.ToString();
+            return count.ToString();
         }
 
         public override string PartTwo(string input)
         {
             var depths = input.Integers().ToArray();
-
-            var a = 0;
-            var count = 0;
-
-            var sum = depths[a] + depths[a + 1] + depths[a + 2];
-
-            a++;
-
-            while (a + 2 < depths.Length)
-            {
-                var newSum = depths[a] + depths[a + 1] + depths[a + 2];
-
-                if (newSum > sum)
-                {
-                    count++;
-                }
-
-                sum = newSum;
-                a++;
-            }
+            depths = depths.SelectWithIndex().Where(x => x.index > 1).Select(x => x.item + depths[x.index - 1] + depths[x.index - 2]).ToArray();
+            var count = depths.SelectWithIndex().Count(x => x.index > 0 && x.item > depths[x.index - 1]);
 
             return count.ToString();
         }
