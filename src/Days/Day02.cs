@@ -5,25 +5,22 @@ public class Day02 : BaseDay
 {
     public override string PartOne(string input)
     {
-        var commands = input.Lines();
-        var hor = 0;
-        var depth = 0;
+        var commands = input.ParseLines(line => (instruction: line.Words().First(), value: long.Parse(line.Words().Last())));
+        var hor = 0L;
+        var depth = 0L;
 
-        foreach (var command in commands)
+        foreach (var (instruction, value) in commands)
         {
-            var instruction = command.Words().First();
-            var value = long.Parse(command.Words().Last());
-
             switch (instruction)
             {
                 case "forward":
-                    hor += int.Parse(command.Split(' ')[1]);
+                    hor += value;
                     break;
                 case "down":
-                    depth += int.Parse(command.Split(' ')[1]);
+                    depth += value;
                     break;
                 case "up":
-                    depth -= int.Parse(command.Split(' ')[1]);
+                    depth -= value;
                     break;
             }
         }
@@ -33,27 +30,25 @@ public class Day02 : BaseDay
 
     public override string PartTwo(string input)
     {
-        var commands = input.Lines();
-        var hor = 0;
-        var depth = 0;
-        var aim = 0;
+        var commands = input.ParseLines(line => (instruction: line.Words().First(), value: long.Parse(line.Words().Last())));
+        var hor = 0L;
+        var depth = 0L;
+        var aim = 0L;
 
-        foreach (var command in commands)
+        foreach (var (instruction, value) in commands)
         {
-            if (command.Split(' ')[0] == "forward")
+            switch (instruction)
             {
-                hor += int.Parse(command.Split(' ')[1]);
-                depth += int.Parse(command.Split(' ')[1]) * aim;
-            }
-
-            if (command.Split(' ')[0] == "down")
-            {
-                aim += int.Parse(command.Split(' ')[1]);
-            }
-
-            if (command.Split(' ')[0] == "up")
-            {
-                aim -= int.Parse(command.Split(' ')[1]);
+                case "forward":
+                    hor += value;
+                    depth += value * aim;
+                    break;
+                case "down":
+                    aim += value;
+                    break;
+                case "up":
+                    aim -= value;
+                    break;
             }
         }
 
