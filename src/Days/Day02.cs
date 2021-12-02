@@ -5,7 +5,8 @@ public class Day02 : BaseDay
 {
     public override string PartOne(string input)
     {
-        var commands = input.ParseLines(line => (instruction: line.Words().First(), value: long.Parse(line.Words().Last())));
+        var commands = input.ParseLines(line => (instruction: line.Words().First(), 
+                                                 value: long.Parse(line.Words().Last())));
         var hor = 0L;
         var depth = 0L;
 
@@ -30,7 +31,8 @@ public class Day02 : BaseDay
 
     public override string PartTwo(string input)
     {
-        var commands = input.ParseLines(line => (instruction: line.Words().First(), value: long.Parse(line.Words().Last())));
+        var commands = input.ParseLines(line => (instruction: line.Words().First(), 
+                                                 value: long.Parse(line.Words().Last())));
         var hor = 0L;
         var depth = 0L;
         var aim = 0L;
@@ -55,4 +57,3 @@ public class Day02 : BaseDay
         return (hor * depth).ToString();
     }
 }
-
