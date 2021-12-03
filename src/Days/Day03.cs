@@ -7,20 +7,20 @@ public class Day03 : BaseDay
     {
         var diag = input.Lines().ToList();
 
-        var gamma = Convert.ToInt64(GetGamma(diag), 2);
-        var epsilon = Convert.ToInt64(GetEpsilon(diag), 2);
+        var gamma = Convert.ToInt64(Gamma(diag), 2);
+        var epsilon = Convert.ToInt64(Epsilon(diag), 2);
 
         return (gamma * epsilon).ToString();
     }
 
-    private string GetGamma(List<string> diag)
+    private string Gamma(List<string> diag)
     {
         var result = string.Empty;
 
         for (var i = 0; i < diag.First().Length; i++)
         {
             var oneCount = diag.Count(x => x[i] == '1');
-            var zeroCount = diag.Count(x => x[i] == '0');
+            var zeroCount = diag.Count - oneCount;
 
             if (oneCount >= zeroCount)
             {
@@ -35,14 +35,14 @@ public class Day03 : BaseDay
         return result;
     }
 
-    private string GetEpsilon(List<string> diag)
+    private string Epsilon(List<string> diag)
     {
         var result = string.Empty;
 
         for (var i = 0; i < diag.First().Length; i++)
         {
             var oneCount = diag.Count(x => x[i] == '1');
-            var zeroCount = diag.Count(x => x[i] == '0');
+            var zeroCount = diag.Count - oneCount;
 
             if (oneCount >= zeroCount)
             {
@@ -64,23 +64,23 @@ public class Day03 : BaseDay
         var scrubber = input.Lines().ToList();
         var pos = 0;
 
-        while (oxygen.Count() > 1)
+        while (oxygen.Count > 1)
         {
-            var gamma = GetGamma(oxygen)[pos];
+            var gamma = Gamma(oxygen);
 
-            oxygen = oxygen.Where(x => x[pos] == gamma).ToList();
+            oxygen = oxygen.Where(x => x[pos] == gamma[pos]).ToList();
             pos++;
         }
 
         pos = 0;
-        while (scrubber.Count() > 1)
+        while (scrubber.Count > 1)
         {
-            var epsilon = GetEpsilon(scrubber)[pos];
+            var epsilon = Epsilon(scrubber);
 
-            scrubber = scrubber.Where(x => x[pos] == epsilon).ToList();
+            scrubber = scrubber.Where(x => x[pos] == epsilon[pos]).ToList();
             pos++;
         }
 
-        return (Convert.ToInt64(oxygen.First(), 2) * Convert.ToInt64(scrubber.First(), 2)).ToString();
+        return (Convert.ToInt64(oxygen.Single(), 2) * Convert.ToInt64(scrubber.Single(), 2)).ToString();
     }
 }
