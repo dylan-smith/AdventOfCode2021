@@ -60,20 +60,9 @@ public class Day04 : BaseDay
         }
     }
 
-    private List<int[,]> ParseBoards(List<string> lines)
-    {
-        var boards = new List<int[,]>();
+    private List<int[,]> ParseBoards(List<string> lines) => lines.Chunk(5).Select(ParseBoard).ToList();
 
-        while (lines.Any())
-        {
-            boards.Add(ParseBoard(lines.Take(5).ToList()));
-            lines = lines.Skip(5).ToList();
-        }
-
-        return boards;
-    }
-
-    private int[,] ParseBoard(List<string> lines)
+    private int[,] ParseBoard(IEnumerable<string> lines)
     {
         var result = new int[5, 5];
         var boardLines = lines.Take(5).ToList();

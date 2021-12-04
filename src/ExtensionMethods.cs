@@ -959,6 +959,17 @@ namespace AdventOfCode
                 }
             }
         }
+
+        public static IEnumerable<IEnumerable<T>> Chunk<T>(this IEnumerable<T> list, int chunkSize)
+        {
+            var pos = 0;
+
+            while (pos < list.Count())
+            {
+                yield return list.Skip(pos).Take(chunkSize);
+                pos += chunkSize;
+            }
+        }
     }
 
     public static class PointExtensions
