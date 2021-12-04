@@ -17,9 +17,8 @@ public class Day01 : BaseDay
     {
         var depths = input.Integers();
 
-        var count = depths.Window(3)
-                          .Select(x => x.Sum())
-                          .Window(2)
+        // This is a trick because if the 4th one is greater than the 1st, that means the new 3-window will be bigger than the previous
+        var count = depths.Window(4)
                           .Count(x => x.Last() > x.First());
 
         return count.ToString();
