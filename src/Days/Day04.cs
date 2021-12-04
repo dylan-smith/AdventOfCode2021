@@ -14,10 +14,7 @@ namespace AdventOfCode.Days
 
             foreach (var number in numbers)
             {
-                foreach (var board in boards)
-                {
-                    MarkBoard(board, number);
-                }
+                boards.ForEach(x => MarkBoard(x, number));
 
                 if (boards.Any(IsWinner))
                 {
@@ -26,6 +23,28 @@ namespace AdventOfCode.Days
 
                     return score.ToString();
                 }
+            }
+
+            return "NOT FOUND!";
+        }
+
+        public override string PartTwo(string input)
+        {
+            var numbers = input.Lines().First().Integers().ToList();
+            var boards = ParseBoards(input.Lines().Skip(1).ToList());
+
+            foreach (var number in numbers)
+            {
+                boards.ForEach(x => MarkBoard(x, number));
+
+                if (boards.Count == 1 && IsWinner(boards.First()))
+                {
+                    var score = ScoreBoard(boards.First(), number);
+
+                    return score.ToString();
+                }
+
+                boards = boards.Where(x => !IsWinner(x)).ToList();
             }
 
             return "NOT FOUND!";
@@ -78,14 +97,14 @@ namespace AdventOfCode.Days
 
         private bool IsWinner(int[,] board)
         {
-            for (var x = 0; x < 5; x++)
+            for (var i = 0; i < 5; i++)
             {
-                if (board[x, 0] == -1 && board[x, 1] == -1 && board[x, 2] == -1 && board[x, 3] == -1 && board[x, 4] == -1)
+                if (board[i, 0] == -1 && board[i, 1] == -1 && board[i, 2] == -1 && board[i, 3] == -1 && board[i, 4] == -1)
                 {
                     return true;
                 }
 
-                if (board[0, x] == -1 && board[1, x] == -1 && board[2, x] == -1 && board[3, x] == -1 && board[4, x] == -1)
+                if (board[0, i] == -1 && board[1, i] == -1 && board[2, i] == -1 && board[3, i] == -1 && board[4, i] == -1)
                 {
                     return true;
                 }
@@ -110,31 +129,6 @@ namespace AdventOfCode.Days
             }
 
             return score * number;
-        }
-
-        public override string PartTwo(string input)
-        {
-            var numbers = input.Lines().First().Integers().ToList();
-            var boards = ParseBoards(input.Lines().Skip(1).ToList());
-
-            foreach (var number in numbers)
-            {
-                foreach (var board in boards)
-                {
-                    MarkBoard(board, number);
-                }
-
-                if (boards.Count == 1 && IsWinner(boards.First()))
-                {
-                    var score = ScoreBoard(boards.First(), number);
-
-                    return score.ToString();
-                }
-                
-                boards = boards.Where(x => !IsWinner(x)).ToList();
-            }
-
-            return "NOT FOUND!";
         }
     }
 }
