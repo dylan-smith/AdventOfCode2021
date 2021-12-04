@@ -986,6 +986,24 @@ namespace AdventOfCode
             }
         }
 
+        public static void Replace<T>(this T[,,] array, T value, T replace)
+        {
+            for (var x = array.GetLowerBound(0); x <= array.GetUpperBound(0); x++)
+            {
+                for (var y = array.GetLowerBound(1); y <= array.GetUpperBound(1); y++)
+                {
+                    for (var z = array.GetLowerBound(2); z <= array.GetUpperBound(2); z++)
+                    {
+                        // Can't use == unless we constraing the generic type
+                        if (EqualityComparer<T>.Default.Equals(array[x, y, z], value))
+                        {
+                            array[x, y, z] = replace;
+                        }
+                    }
+                }
+            }
+        }
+
         public static void SetRow<T>(this T[,] array, int row, IEnumerable<T> values)
         {
             var col = 0;
