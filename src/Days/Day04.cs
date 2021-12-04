@@ -46,35 +46,18 @@ public class Day04 : BaseDay
         return "NOT FOUND!";
     }
 
-    private void MarkBoard(int[,] board, int number)
-    {
-        for (var x = 0; x < 5; x++)
-        {
-            for (var y = 0; y < 5; y++)
-            {
-                if (board[x, y] == number)
-                {
-                    board[x, y] = -1;
-                }
-            }
-        }
-    }
+    private void MarkBoard(int[,] board, int number) => board.Replace(number, -1);
 
     private List<int[,]> ParseBoards(List<string> lines) => lines.Chunk(5).Select(ParseBoard).ToList();
 
     private int[,] ParseBoard(IEnumerable<string> lines)
     {
         var result = new int[5, 5];
-        var boardLines = lines.Take(5).ToList();
+        var row = 0;
 
-        for (var y = 0; y < 5; y++)
+        foreach (var line in lines)
         {
-            var line = boardLines[y].Integers().ToList();
-
-            for (var x = 0; x < 5; x++)
-            {
-                result[x, y] = line[x];
-            }
+            result.SetRow(row++, line.Integers());
         }
 
         return result;
@@ -82,17 +65,14 @@ public class Day04 : BaseDay
 
     private bool IsWinner(int[,] board)
     {
-        for (var i = 0; i < 5; i++)
+        if (board.Rows().Any(x => x.Count(y => y == -1) == 5))
         {
-            if (board[i, 0] == -1 && board[i, 1] == -1 && board[i, 2] == -1 && board[i, 3] == -1 && board[i, 4] == -1)
-            {
-                return true;
-            }
+            return true;
+        }
 
-            if (board[0, i] == -1 && board[1, i] == -1 && board[2, i] == -1 && board[3, i] == -1 && board[4, i] == -1)
-            {
-                return true;
-            }
+        if (board.Cols().Any(x => x.Count(y => y == -1) == 5))
+        {
+            return true;
         }
 
         return false;
@@ -100,18 +80,7 @@ public class Day04 : BaseDay
 
     private int ScoreBoard(int[,] board, int number)
     {
-        var score = 0;
-
-        for (var x = 0; x < 5; x++)
-        {
-            for (var y = 0; y < 5; y++)
-            {
-                if (board[x, y] > 0)
-                {
-                    score += board[x, y];
-                }
-            }
-        }
+        var score = board.ToList().Where(x => x > 0).Sum();
 
         return score * number;
     }

@@ -970,6 +970,73 @@ namespace AdventOfCode
                 pos += chunkSize;
             }
         }
+
+        public static void Replace<T>(this T[,] array, T value, T replace)
+        {
+            for (var x = array.GetLowerBound(0); x <= array.GetUpperBound(0); x++)
+            {
+                for (var y = array.GetLowerBound(1); y <= array.GetUpperBound(1); y++)
+                {
+                    // Can't use == unless we constraing the generic type
+                    if (EqualityComparer<T>.Default.Equals(array[x, y], value))
+                    {
+                        array[x, y] = replace;
+                    }
+                }
+            }
+        }
+
+        public static void SetRow<T>(this T[,] array, int row, IEnumerable<T> values)
+        {
+            var col = 0;
+
+            foreach (var value in values)
+            {
+                array[col++, row] = value;
+            }
+        }
+
+        public static void SetCol<T>(this T[,] array, int col, IEnumerable<T> values)
+        {
+            var row = 0;
+
+            foreach (var value in values)
+            {
+                array[col, row++] = value;
+            }
+        }
+
+        public static IEnumerable<T> GetRow<T>(this T[,] array, int row)
+        {
+            for (var x = array.GetLowerBound(0); x <= array.GetUpperBound(0); x++)
+            {
+                yield return array[x, row];
+            }
+        }
+
+        public static IEnumerable<T> GetCol<T>(this T[,] array, int col)
+        {
+            for (var y = array.GetLowerBound(1); y <= array.GetUpperBound(1); y++)
+            {
+                yield return array[col, y];
+            }
+        }
+
+        public static IEnumerable<IEnumerable<T>> Rows<T>(this T[,] array)
+        {
+            for (var y = array.GetLowerBound(1); y <= array.GetUpperBound(1); y++)
+            {
+                yield return array.GetRow(y);
+            }
+        }
+
+        public static IEnumerable<IEnumerable<T>> Cols<T>(this T[,] array)
+        {
+            for (var x = array.GetLowerBound(0); x <= array.GetUpperBound(0); x++)
+            {
+                yield return array.GetCol(x);
+            }
+        }
     }
 
     public static class PointExtensions
