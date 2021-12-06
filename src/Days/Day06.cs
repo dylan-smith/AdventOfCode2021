@@ -9,33 +9,36 @@ namespace AdventOfCode.Days
     {
         public override string PartOne(string input)
         {
-            var fish = input.Integers().ToList();
+            var fish = InitFish(input);
+            80.Times(() => fish = SimulateFish(fish));
 
-            return SimulateFish(fish, 80).ToString();
+            return fish.Sum(x => x.Value).ToString();
         }
 
         public override string PartTwo(string input)
         {
-            var fish = input.Integers().ToList();
+            var fish = InitFish(input);
+            256.Times(() => fish = SimulateFish(fish));
 
-            return SimulateFish(fish, 256).ToString();
+            return fish.Sum(x => x.Value).ToString();
         }
 
-        private long SimulateFish(IEnumerable<int> fish, int days)
+        private IDictionary<int, long> InitFish(string input)
         {
-            var lanterns = new Dictionary<int, long>();
-            fish.ForEach(f => lanterns.SafeIncrement(f));
+            var inputFish = input.Integers().ToList();
+            IDictionary<int, long> fish = new Dictionary<int, long>();
+            inputFish.ForEach(f => fish.SafeIncrement(f));
 
-            days.Times(() =>
-            {
-                var newLanterns = new Dictionary<int, long>();
-                lanterns.ForEach(x => newLanterns.SafeSet((x.Key + 8) % 9, x.Value));
-                newLanterns.SafeIncrement(6, lanterns.SafeGet(0));
+            return fish;
+        }
 
-                lanterns = newLanterns;
-            });
+        private IDictionary<int, long> SimulateFish(IDictionary<int, long> fish)
+        {
+            var newFish = new Dictionary<int, long>();
+            fish.ForEach(x => newFish.SafeSet((x.Key + 8) % 9, x.Value));
+            newFish.SafeIncrement(6, fish.SafeGet(0));
 
-            return lanterns.Sum(x => x.Value);
+            return newFish;
         }
     }
 }
