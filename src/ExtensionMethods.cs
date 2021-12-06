@@ -822,6 +822,42 @@ namespace AdventOfCode
             }
         }
 
+        public static void SafeIncrement<TKey>(this Dictionary<TKey, long> dict, TKey key)
+        {
+            if (dict.ContainsKey(key))
+            {
+                dict[key]++;
+            }
+            else
+            {
+                dict.Add(key, 1);
+            }
+        }
+
+        public static void SafeIncrement<TKey>(this Dictionary<TKey, long> dict, TKey key, long amount)
+        {
+            if (dict.ContainsKey(key))
+            {
+                dict[key] += amount;
+            }
+            else
+            {
+                dict.Add(key, amount);
+            }
+        }
+
+        public static void SafeDecrement<TKey>(this Dictionary<TKey, long> dict, TKey key)
+        {
+            if (dict.ContainsKey(key))
+            {
+                dict[key]++;
+            }
+            else
+            {
+                dict.Add(key, -1);
+            }
+        }
+
         public static void SafeSet<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue value)
         {
             if (dict.ContainsKey(key))
@@ -843,6 +879,8 @@ namespace AdventOfCode
 
             return false;
         }
+
+        public static TValue SafeGet<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key) => dict.ContainsKey(key) ? dict[key] : default;
 
         public static void ForEach<T>(this IEnumerable<T> list, Action<T> action)
         {
