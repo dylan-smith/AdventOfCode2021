@@ -1582,6 +1582,22 @@ namespace AdventOfCode
 
             return true;
         }
+
+        public static void Times(this int number, Action action)
+        {
+            for (var i = 0; i < number; i++)
+            {
+                action();
+            }
+        }
+
+        public static void Times(this int number, Action<int> action)
+        {
+            for (var i = 0; i < number; i++)
+            {
+                action(i);
+            }
+        }
     }
 
     public class Point3D : IEquatable<Point3D>

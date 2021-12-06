@@ -26,14 +26,14 @@ namespace AdventOfCode.Days
             var lanterns = new Dictionary<int, long>();
             fish.ForEach(f => lanterns.SafeIncrement(f));
 
-            for (var day = 1; day <= days; day++)
+            days.Times(() =>
             {
                 var newLanterns = new Dictionary<int, long>();
                 lanterns.ForEach(x => newLanterns.SafeSet((x.Key + 8) % 9, x.Value));
                 newLanterns.SafeIncrement(6, lanterns.SafeGet(0));
 
                 lanterns = newLanterns;
-            }
+            });
 
             return lanterns.Sum(x => x.Value);
         }
