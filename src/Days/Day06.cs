@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace AdventOfCode.Days
+﻿namespace AdventOfCode.Days
 {
     [Day(2021, 6)]
     public class Day06 : BaseDay
