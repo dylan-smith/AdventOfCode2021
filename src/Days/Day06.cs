@@ -22,7 +22,7 @@ public class Day06 : BaseDay
     private IDictionary<int, long> InitFish(string input)
     {
         var inputFish = input.Integers().ToList();
-        IDictionary<int, long> fish = new Dictionary<int, long>();
+        var fish = new Dictionary<int, long>();
         inputFish.ForEach(f => fish.SafeIncrement(f));
 
         return fish;
