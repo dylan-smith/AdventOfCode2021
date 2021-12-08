@@ -3,11 +3,9 @@
 [Day(2021, 8)]
 public class Day08 : BaseDay
 {
-    private IEnumerable<char> letters = new List<char>() { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
-
-    private IDictionary<string, string> _digitPatterns = new Dictionary<string, string>();
-    private IEnumerable<string> _mappings = "abcdefg".GetPermutations<string>().ToList();
-    private string _defaultMap = "abcdefg";
+    private readonly IDictionary<string, string> _digitPatterns = new Dictionary<string, string>();
+    private readonly IEnumerable<string> _mappings = "abcdefg".GetPermutations<string>().ToList();
+    private readonly string _defaultMap = "abcdefg";
 
     public Day08()
     {
