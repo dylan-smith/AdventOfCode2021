@@ -57,7 +57,7 @@ public class Day08 : BaseDay
 
     private int SolveDisplay(IEnumerable<string> patterns, IEnumerable<string> digits)
     {
-        var mapping = _mappings.Single(x => IsValidMapping(x, patterns));
+        var mapping = _mappings.First(x => IsValidMapping(x, patterns));
 
         return ResolveDigits(mapping, digits);
     }
