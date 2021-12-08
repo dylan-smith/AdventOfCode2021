@@ -36,8 +36,8 @@ public class Day08 : BaseDay
         var left = line[..splitPos];
         var right = line[(splitPos + 1)..];
 
-        var patterns = left.Words().Select(NormalizePattern);
-        var digits = right.Words().Select(NormalizePattern);
+        var patterns = left.Words();
+        var digits = right.Words();
 
         return (patterns, digits);
     }
