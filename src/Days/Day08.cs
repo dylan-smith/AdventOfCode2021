@@ -42,8 +42,6 @@ public class Day08 : BaseDay
         return (patterns, digits);
     }
 
-    private string NormalizePattern(string pattern) => string.Concat(pattern.OrderBy(c => c));
-
     public override string PartTwo(string input)
     {
         var displays = input.ParseLines(ParseLine);
@@ -81,5 +79,7 @@ public class Day08 : BaseDay
         var result = pattern.Select(c => _defaultMap[mapping.IndexOf(c)]);
         return NormalizePattern(string.Concat(result));
     }
+
+    private string NormalizePattern(string pattern) => string.Concat(pattern.OrderBy(c => c));
 }
 
