@@ -69,7 +69,7 @@ public class Day08 : BaseDay
 
     private bool IsValidMapping(string mapping, IEnumerable<string> patterns)
     {
-        var mappedPatterns = patterns.Select(x => MapPattern(x, mapping)).Select(NormalizePattern);
+        var mappedPatterns = patterns.Select(x => MapPattern(x, mapping));
 
         return IsCorrectPatterns(mappedPatterns);
     }
