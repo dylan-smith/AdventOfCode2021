@@ -8,18 +8,9 @@ public class Day09 : BaseDay
     public override string PartOne(string input)
     {
         var heights = input.CreateCharGrid();
-        var result = 0;
+        var lowPoints = GetLowPoints(heights);
 
-        for ( var x = 0; x <= heights.GetUpperBound(0); x++ )
-        {
-            for (var y = 0; y <= heights.GetUpperBound(1); y++ )
-            {
-                if (IsLowPoint(x, y, heights))
-                {
-                    result += int.Parse(heights[x, y].ToString()) + 1;
-                }
-            }
-        }
+        var result = lowPoints.Sum(p => int.Parse(heights[p.X, p.Y].ToString()) + 1);
 
         return result.ToString();
     }
@@ -28,12 +19,7 @@ public class Day09 : BaseDay
     {
         var neighbours = heights.GetNeighbors(x, y, false);
 
-        if (neighbours.All(n => int.Parse(n.ToString()) > int.Parse(heights[x, y].ToString())))
-        {
-            return true;
-        }
-
-        return false;
+        return neighbours.All(n => int.Parse(n.ToString()) > int.Parse(heights[x, y].ToString()));
     }
 
     public override string PartTwo(string input)
@@ -50,15 +36,18 @@ public class Day09 : BaseDay
 
     private int GetBasinSize(char[,] heights, Point p)
     {
-        var basinPoints = new HashSet<Point>() { p };
-        var next = basinPoints.SelectMany(x => heights.GetNeighborPoints(x)).Where(x => heights[x.point.X, x.point.Y] != '9').Where(p => !basinPoints.Contains(p.point)).Select(p => p.point).ToList();
-        //var next = basinPoints.SelectMany(x => x.GetNeighbors(false)).Where(p => p.X >= 0 && p.Y >= 0).Where(x => heights[x.X, x.Y] != '9').Where(p => !basinPoints.Contains(p)).ToList();
+        var basinPoints = new HashSet<Point>();
+
+        var next = new List<Point>() { p };
 
         while (next.Any())
         {
             basinPoints.AddRange(next);
-            next = basinPoints.SelectMany(x => heights.GetNeighborPoints(x)).Where(x => heights[x.point.X, x.point.Y] != '9').Where(p => !basinPoints.Contains(p.point)).Select(p => p.point).ToList();
-            //next = basinPoints.SelectMany(x => x.GetNeighbors(false)).Where(p => p.X >= 0 && p.Y >= 0).Where(x => heights[x.X, x.Y] != '9').Where(p => !basinPoints.Contains(p)).ToList();
+            next = basinPoints.SelectMany(x => heights.GetNeighborPoints(x))
+                              .Where(x => heights[x.point.X, x.point.Y] != '9')
+                              .Where(p => !basinPoints.Contains(p.point))
+                              .Select(p => p.point)
+                              .ToList();
         }
 
         return basinPoints.Count;
