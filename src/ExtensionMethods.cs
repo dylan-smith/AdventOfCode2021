@@ -1009,21 +1009,6 @@ namespace AdventOfCode
             }
         }
 
-        public static void Replace<T>(this T[,] array, T value, T replace)
-        {
-            for (var x = array.GetLowerBound(0); x <= array.GetUpperBound(0); x++)
-            {
-                for (var y = array.GetLowerBound(1); y <= array.GetUpperBound(1); y++)
-                {
-                    // Can't use == unless we constraing the generic type
-                    if (EqualityComparer<T>.Default.Equals(array[x, y], value))
-                    {
-                        array[x, y] = replace;
-                    }
-                }
-            }
-        }
-
         public static void Replace<T>(this T[,,] array, T value, T replace)
         {
             for (var x = array.GetLowerBound(0); x <= array.GetUpperBound(0); x++)
@@ -1210,7 +1195,7 @@ namespace AdventOfCode
 
     public static class CharGridExtensions
     {
-        public static IEnumerable<Point> GetPoints(this char[,] grid)
+        public static IEnumerable<Point> GetPoints<T>(this T[,] grid)
         {
             for (var y = 0; y < grid.GetLength(1); y++)
             {
@@ -1237,6 +1222,22 @@ namespace AdventOfCode
             return result;
         }
 
+        public static int[,] CreateIntGrid(this string input)
+        {
+            var lines = input.Lines().ToList();
+            var result = new int[lines[0].Length, lines.Count];
+
+            for (var y = 0; y < lines.Count; y++)
+            {
+                for (var x = 0; x < lines[0].Length; x++)
+                {
+                    result[x, y] = int.Parse(lines[y][x].ToString());
+                }
+            }
+
+            return result;
+        }
+
         public static string GetString(this char[,] grid)
         {
             var sb = new StringBuilder(grid.GetLength(0) * grid.GetLength(1) + (Environment.NewLine.Length * grid.GetLength(1)));
@@ -1245,13 +1246,18 @@ namespace AdventOfCode
             {
                 for (var x = 0; x <= grid.GetUpperBound(0); x++)
                 {
-                    sb.Append(grid[x, y]);
+                    _ = sb.Append(grid[x, y]);
                 }
 
-                sb.Append(Environment.NewLine);
+                _ = sb.Append(Environment.NewLine);
             }
 
             return sb.ToString();
+        }
+
+        public static IEnumerable<Point> GetPoints<T>(this T[,] grid, T match)
+        {
+            return GetPoints(grid).Where(p => EqualityComparer<T>.Default.Equals(grid[p.X, p.Y], match));
         }
 
         public static IEnumerable<Point> GetPoints(this char[,] grid, char match)
@@ -1259,17 +1265,22 @@ namespace AdventOfCode
             return GetPoints(grid).Where(p => grid[p.X, p.Y] == match);
         }
 
-        public static IEnumerable<Point> GetPoints(this char[,] grid, Func<char, bool> match)
+        public static IEnumerable<Point> GetPoints(this int[,] grid, int match)
+        {
+            return GetPoints(grid).Where(p => grid[p.X, p.Y] == match);
+        }
+
+        public static IEnumerable<Point> GetPoints<T>(this T[,] grid, Func<T, bool> match)
         {
             return GetPoints(grid).Where(p => match(grid[p.X, p.Y]));
         }
 
-        public static IEnumerable<Point> GetPoints(this char[,] grid, Func<Point, bool> match)
+        public static IEnumerable<Point> GetPoints<T>(this T[,] grid, Func<Point, bool> match)
         {
             return GetPoints(grid).Where(match);
         }
 
-        public static void Replace(this char[,] grid, char match, char replace)
+        public static void Replace<T>(this T[,] grid, T match, T replace)
         {
             foreach (var p in grid.GetPoints(match))
             {
@@ -1277,7 +1288,7 @@ namespace AdventOfCode
             }
         }
 
-        public static int Count(this char[,] grid, char match)
+        public static int Count<T>(this T[,] grid, T match)
         {
             var result = 0;
 
@@ -1285,7 +1296,7 @@ namespace AdventOfCode
             {
                 for (var x = 0; x < grid.GetLength(0); x++)
                 {
-                    if (grid[x, y] == match)
+                    if (EqualityComparer<T>.Default.Equals(grid[x, y], match))
                     {
                         result++;
                     }
@@ -1295,9 +1306,9 @@ namespace AdventOfCode
             return result;
         }
 
-        public static char[,] Clone(this char[,] grid, Func<int, int, char, char> transform)
+        public static T[,] Clone<T>(this T[,] grid, Func<int, int, T, T> transform)
         {
-            var result = new char[grid.GetLength(0), grid.GetLength(1)];
+            var result = new T[grid.GetLength(0), grid.GetLength(1)];
 
             for (var y = 0; y < grid.GetLength(1); y++)
             {
@@ -1310,9 +1321,9 @@ namespace AdventOfCode
             return result;
         }
 
-        public static char[,] Clone(this char[,] grid, Func<char, char> transform)
+        public static T[,] Clone<T>(this T[,] grid, Func<T, T> transform)
         {
-            var result = new char[grid.GetLength(0), grid.GetLength(1)];
+            var result = new T[grid.GetLength(0), grid.GetLength(1)];
 
             for (var y = 0; y < grid.GetLength(1); y++)
             {
@@ -1325,12 +1336,12 @@ namespace AdventOfCode
             return result;
         }
 
-        public static char[,] Clone(this char[,] grid)
+        public static T[,] Clone<T>(this T[,] grid)
         {
             return grid.Clone(c => c);
         }
 
-        public static IEnumerable<char> GetNeighbors(this char[,] map, int x, int y, bool includeDiagonals)
+        public static IEnumerable<T> GetNeighbors<T>(this T[,] map, int x, int y, bool includeDiagonals)
         {
             var neighbors = new Point(x, y).GetNeighbors(includeDiagonals);
 
@@ -1343,19 +1354,39 @@ namespace AdventOfCode
             }
         }
 
-        public static IEnumerable<char> GetNeighbors(this char[,] map, int x, int y)
+        public static IEnumerable<T> GetNeighbors<T>(this T[,] map, Point pos, bool includeDiagonals)
+        {
+            return map.GetNeighbors(pos.X, pos.Y, includeDiagonals);
+        }
+
+        public static IEnumerable<T> GetNeighbors<T>(this T[,] map, int x, int y)
         {
             return map.GetNeighbors(x, y, true);
         }
 
-        public static IEnumerable<(Point point, char c)> GetNeighborPoints(this char[,] map, int x, int y)
+        public static IEnumerable<T> GetNeighbors<T>(this T[,] map, Point pos)
+        {
+            return map.GetNeighbors(pos, true);
+        }
+
+        public static IEnumerable<(Point point, T c)> GetNeighborPoints<T>(this T[,] map, int x, int y)
         {
             return map.GetNeighborPoints(new Point(x, y));
         }
 
-        public static IEnumerable<(Point point, char c)> GetNeighborPoints(this char[,] map, Point p)
+        public static IEnumerable<(Point point, T c)> GetNeighborPoints<T>(this T[,] map, int x, int y, bool includeDiagonals)
         {
-            var neighbors = p.GetNeighbors(false);
+            return map.GetNeighborPoints(new Point(x, y), includeDiagonals);
+        }
+
+        public static IEnumerable<(Point point, T c)> GetNeighborPoints<T>(this T[,] map, Point p)
+        {
+            return map.GetNeighborPoints(p, false);
+        }
+
+        public static IEnumerable<(Point point, T c)> GetNeighborPoints<T>(this T[,] map, Point p, bool includeDiagonals)
+        {
+            var neighbors = p.GetNeighbors(includeDiagonals);
 
             foreach (var n in neighbors)
             {
@@ -1366,7 +1397,7 @@ namespace AdventOfCode
             }
         }
 
-        public static Dictionary<Point, int> FindShortestPaths(this char[,] grid, Func<char, bool> validMove, Point start)
+        public static Dictionary<Point, int> FindShortestPaths<T>(this T[,] grid, Func<T, bool> validMove, Point start)
         {
             var steps = 0;
             var result = new Dictionary<Point, int>();
@@ -1389,7 +1420,7 @@ namespace AdventOfCode
             return result;
         }
 
-        public static int FindShortestPath(this char[,] grid, Func<char, bool> validMove, Point start, Point end)
+        public static int FindShortestPath<T>(this T[,] grid, Func<T, bool> validMove, Point start, Point end)
         {
             var seen = new HashSet<Point>();
             var steps = 0;
@@ -1420,7 +1451,7 @@ namespace AdventOfCode
             return -1;
         }
 
-        public static bool IsValidPoint(this char[,] grid, Point point)
+        public static bool IsValidPoint<T>(this T[,] grid, Point point)
         {
             if (point.X >= 0 && point.X < grid.GetLength(0))
             {
@@ -1503,12 +1534,12 @@ namespace AdventOfCode
             return grid.GetUpperBound(1) + 1;
         }
 
-        public static char GetCharWithWrapping(this char[,] grid, int x, int y)
+        public static T GetItemWithWrapping<T>(this T[,] grid, int x, int y)
         {
             return grid[x % grid.Width(), y % grid.Height()];
         }
 
-        public static char[,] RotateClockwise(this char[,] grid, int count)
+        public static T[,] RotateClockwise<T>(this T[,] grid, int count)
         {
             var result = grid;
 
@@ -1520,9 +1551,9 @@ namespace AdventOfCode
             return result;
         }
 
-        public static char[,] RotateClockwise(this char[,] grid)
+        public static T[,] RotateClockwise<T>(this T[,] grid)
         {
-            var result = new char[grid.Width(), grid.Height()];
+            var result = new T[grid.Width(), grid.Height()];
 
             for (var y = 0; y < grid.Height(); y++)
             {
@@ -1535,9 +1566,9 @@ namespace AdventOfCode
             return result;
         }
 
-        public static char[,] FlipVertical(this char[,] grid)
+        public static T[,] FlipVertical<T>(this T[,] grid)
         {
-            var result = new char[grid.Width(), grid.Height()];
+            var result = new T[grid.Width(), grid.Height()];
 
             for (var y = 0; y < grid.Height(); y++)
             {
@@ -1550,9 +1581,9 @@ namespace AdventOfCode
             return result;
         }
 
-        public static char[,] FlipHorizontal(this char[,] grid)
+        public static T[,] FlipHorizontal<T>(this T[,] grid)
         {
-            var result = new char[grid.Width(), grid.Height()];
+            var result = new T[grid.Width(), grid.Height()];
 
             for (var y = 0; y < grid.Height(); y++)
             {
@@ -1563,6 +1594,17 @@ namespace AdventOfCode
             }
 
             return result;
+        }
+
+        public static void Increment(this int[,] grid)
+        {
+            for (var y = 0; y < grid.Height(); y++)
+            {
+                for (var x = 0; x < grid.Width(); x++)
+                {
+                    grid[x, y]++;
+                }
+            }
         }
     }
 
@@ -1670,11 +1712,7 @@ namespace AdventOfCode
 
         public override int GetHashCode()
         {
-            var hashCode = -307843816;
-            hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            hashCode = hashCode * -1521134295 + Z.GetHashCode();
-            return hashCode;
+            return HashCode.Combine(X, Y, Z);
         }
 
         public IEnumerable<Point3D> GetNeighbors()
