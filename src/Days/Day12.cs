@@ -3,6 +3,8 @@
 [Day(2021, 12)]
 public class Day12 : BaseDay
 {
+    private IDictionary<string, IEnumerable<string>> _next = new Dictionary<string, IEnumerable<string>>();
+
     public override string PartOne(string input)
     {
         //var paths_old = input.ParseLines(ParseLine).ToList();
@@ -63,15 +65,13 @@ public class Day12 : BaseDay
         return result;
     }
 
-    private int CountPaths2(List<string> been, IEnumerable<(string start, string end)> paths)
+    private int CountPaths2(List<string> seen, IEnumerable<(string start, string end)> paths)
     {
-        var pos = been.Last();
-
-        var next = paths.Where(x => x.start == pos && x.end != "start").Select(x => x.end).ToList();
+        var pos = seen.Last();
 
         var result = 0;
 
-        foreach (var n in next)
+        foreach (var n in _next[pos])
         {
             if (n == "end")
             {
@@ -79,32 +79,11 @@ public class Day12 : BaseDay
             }
             else
             {
-                if (n.ToLower() != n)
+                if (n.ToLower() != n || !seen.Contains(n) || NoDoubleSmall(seen))
                 {
-                    var been2 = new List<string>(been);
-                    been2.Add(n);
-
-                    result += CountPaths2(been2, paths);
-                }
-                else
-                {
-                    if (!been.Contains(n))
-                    {
-                        var been2 = new List<string>(been);
-                        been2.Add(n);
-
-                        result += CountPaths2(been2, paths);
-                    }
-                    else
-                    {
-                        if (NoDoubleSmall(been))
-                        {
-                            var been2 = new List<string>(been);
-                            been2.Add(n);
-
-                            result += CountPaths2(been2, paths);
-                        }
-                    }
+                    seen.Add(n);
+                    result += CountPaths2(seen, paths);
+                    seen.Remove(n);
                 }
             }
         }
@@ -112,9 +91,9 @@ public class Day12 : BaseDay
         return result;
     }
 
-    private bool NoDoubleSmall(List<string> been)
+    private bool NoDoubleSmall(List<string> seen)
     {
-        var max = been.Where(x => x.ToLower() == x).GroupBy(x => x).Max(x => x.Count());
+        var max = seen.Where(x => x.ToLower() == x).GroupBy(x => x).Max(x => x.Count());
 
         return max <= 1;
     }
@@ -138,10 +117,17 @@ public class Day12 : BaseDay
             paths.Add((p.end, p.start));
         }
 
-        var been = new List<string>();
-        been.Add("start");
+        var caves = paths.Select(p => p.start).Distinct();
 
-        var result = CountPaths2(been, paths);
+        foreach (var cave in caves)
+        {
+            _next.Add(cave, paths.Where(p => p.start == cave && p.end != "start").Select(p => p.end).ToList());
+        }
+
+        var seen = new List<string>();
+        seen.Add("start");
+
+        var result = CountPaths2(seen, paths);
 
         return result.ToString();
     }
