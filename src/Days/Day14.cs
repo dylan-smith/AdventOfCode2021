@@ -13,7 +13,7 @@ namespace AdventOfCode.Days
             var polymer = input.Lines().First();
             var rules = input.Lines().Skip(1).Select(ParseRule).ToList();
 
-            40.Times(() => polymer = Step(polymer, rules));
+            10.Times(() => polymer = Step(polymer, rules));
 
             var max = polymer.GroupBy(c => c).Max(g => g.Count());
             var min = polymer.GroupBy(c => c).Min(g => g.Count());
@@ -40,7 +40,6 @@ namespace AdventOfCode.Days
                 }
             }
 
-            //base.Log(result);
             return result;
         }
 
@@ -51,7 +50,90 @@ namespace AdventOfCode.Days
 
         public override string PartTwo(string input)
         {
-            return string.Empty;
+            var polymer = input.Lines().First();
+            var rules = input.Lines().Skip(1).Select(ParseRule).ToList();
+            var steps = 40;
+
+            var pairData = new Dictionary<string, Dictionary<int, Dictionary<char, long>>>();
+
+            foreach (var rule in rules)
+            {
+                CalcPairData(rule.pair, steps, rules, pairData);
+            }
+
+            var elementCounts = new Dictionary<char, long>();
+
+            elementCounts.SafeIncrement(polymer.First());
+
+            foreach (var window in polymer.Window(2).ToList())
+            {
+                var pair = $"{window.First().ToString()}{window.Last().ToString()}";
+
+                foreach (var counts in pairData[pair][steps])
+                {
+                    elementCounts.SafeIncrement(counts.Key, counts.Value);
+                }
+
+                elementCounts.SafeDecrement(window.First());
+            }
+
+            var max = elementCounts.Max(x => x.Value);
+            var min = elementCounts.Min(x => x.Value);
+
+            return (max - min).ToString();
+        }
+
+        private void CalcPairData(string pair, int steps, List<(string pair, char element)> rules, Dictionary<string, Dictionary<int, Dictionary<char, long>>> pairData)
+        {
+            if (pairData.ContainsKey(pair) && pairData[pair].ContainsKey(steps))
+            {
+                return;
+            }
+
+            var after = Step(pair, rules);
+            var result = new Dictionary<char, long>();
+
+            if (steps == 1)
+            {
+                foreach (var c in after)
+                {
+                    result.SafeIncrement(c);
+                }
+            }
+            else
+            {
+                var pair1 = after.ShaveRight(1);
+                var pair2 = after.ShaveLeft(1);
+
+                if (!pairData.ContainsKey(pair1) || !pairData[pair1].ContainsKey(steps - 1))
+                {
+                    CalcPairData(pair1, steps - 1, rules, pairData);
+                }
+
+                if (!pairData.ContainsKey(pair2) || !pairData[pair2].ContainsKey(steps - 1))
+                {
+                    CalcPairData(pair2, steps - 1, rules, pairData);
+                }
+
+                foreach (var i in pairData[pair1][steps - 1])
+                {
+                    result.SafeIncrement(i.Key, i.Value);
+                }
+
+                foreach (var i in pairData[pair2][steps - 1])
+                {
+                    result.SafeIncrement(i.Key, i.Value);
+                }
+
+                result.SafeDecrement(after[1]);
+            }
+
+            if (!pairData.ContainsKey(pair))
+            {
+                pairData.Add(pair, new Dictionary<int, Dictionary<char, long>>());
+            }
+
+            pairData[pair].Add(steps, result);
         }
     }
 }

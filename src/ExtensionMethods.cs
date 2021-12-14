@@ -814,7 +814,7 @@ namespace AdventOfCode
         {
             if (dict.ContainsKey(key))
             {
-                dict[key]++;
+                dict[key]--;
             }
             else
             {
@@ -850,7 +850,7 @@ namespace AdventOfCode
         {
             if (dict.ContainsKey(key))
             {
-                dict[key]++;
+                dict[key]--;
             }
             else
             {
