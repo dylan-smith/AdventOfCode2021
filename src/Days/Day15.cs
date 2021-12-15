@@ -69,6 +69,7 @@ public class Day15 : BaseDay
         {
             if (cost < _maxCost)
             {
+                base.Log($"Max Cost: {cost}");
                 _maxCost = cost;
             }
         }
@@ -85,6 +86,45 @@ public class Day15 : BaseDay
 
     public override string PartTwo(string input)
     {
-        return string.Empty;
+        var lines = input.Lines().ToList();
+        var inputWidth = lines[0].Length;
+        var inputHeight = lines.Count;
+        _grid = new int[inputWidth * 5, inputHeight * 5];
+
+        for (var y = 0; y < lines.Count; y++)
+        {
+            for (var x = 0; x < lines[0].Length; x++)
+            {
+                var startValue = int.Parse(lines[y][x].ToString());
+
+                for (var i = 0; i < 5; i++)
+                {
+                    for (var j = 0; j < 5; j++)
+                    {
+                        var tileX = x + (i * inputWidth);
+                        var tileY = y + (j * inputHeight);
+
+                        var tileValue = startValue + i + j;
+
+                        if (tileValue > 9)
+                        {
+                            tileValue -= 9;
+                        }
+
+                        _grid[tileX, tileY] = tileValue;
+                    }
+                }
+            }
+        }
+
+        var pos = new Point(_grid.Width() - 1, _grid.Height() - 1);
+        _costs = new Dictionary<Point, long>();
+
+        _maxCost = GetMaxCost();
+        base.Log($"Max Cost: {_maxCost}");
+
+        CalcCosts(pos, _grid[pos.X, pos.Y]);
+
+        return (_costs[new Point(0, 0)] - _grid[0, 0]).ToString();
     }
 }
