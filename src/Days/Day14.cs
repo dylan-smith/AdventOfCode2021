@@ -44,34 +44,26 @@ public class Day14 : BaseDay
         return (line.Words().First(), line.Words().Last()[0]);
     }
 
+    private Dictionary<string, string> _rules;
+    private Dictionary<(string pair, int steps), Dictionary<char, long>> _lookup;
+
     public override string PartTwo(string input)
     {
         var polymer = input.Lines().First();
         var rules = input.Lines().Skip(1).Select(ParseRule).ToList();
-        var steps = 40;
+        var steps = 1;
 
-        var pairData = new Dictionary<string, Dictionary<int, Dictionary<char, long>>>();
+        _rules = new Dictionary<string, string>();
+        rules.ForEach(r => _rules.Add(r.pair, r.element.ToString()));
 
-        foreach (var (pair, _) in rules)
+        _lookup = new Dictionary<(string pair, int steps), Dictionary<char, long>>();
+
+        foreach (var rule in _rules)
         {
-            CalcPairData(pair, steps, rules, pairData);
+            _lookup.Add((rule.Key, steps), CalcPairData(rule.Key, steps));
         }
 
-        var elementCounts = new Dictionary<char, long>();
-
-        elementCounts.SafeIncrement(polymer.First());
-
-        foreach (var window in polymer.Window(2).ToList())
-        {
-            var pair = $"{window.First().ToString()}{window.Last().ToString()}";
-
-            foreach (var counts in pairData[pair][steps])
-            {
-                elementCounts.SafeIncrement(counts.Key, counts.Value);
-            }
-
-            elementCounts.SafeDecrement(window.First());
-        }
+        var elementCounts = ExpandPolymer(polymer, steps);
 
         var max = elementCounts.Max(x => x.Value);
         var min = elementCounts.Min(x => x.Value);
@@ -79,56 +71,67 @@ public class Day14 : BaseDay
         return (max - min).ToString();
     }
 
-    private void CalcPairData(string pair, int steps, List<(string pair, char element)> rules, Dictionary<string, Dictionary<int, Dictionary<char, long>>> pairData)
+    private Dictionary<char, long> ExpandPolymer(string polymer, int steps)
     {
-        if (pairData.ContainsKey(pair) && pairData[pair].ContainsKey(steps))
-        {
-            return;
-        }
-
-        var after = Step(pair, rules);
         var result = new Dictionary<char, long>();
 
-        if (steps == 1)
+        result.SafeIncrement(polymer.First());
+
+        foreach (var pair in polymer.WindowS(2).ToList())
         {
-            foreach (var c in after)
+            foreach (var counts in _lookup[(pair, steps)])
             {
-                result.SafeIncrement(c);
-            }
-        }
-        else
-        {
-            var pair1 = after.ShaveRight(1);
-            var pair2 = after.ShaveLeft(1);
-
-            if (!pairData.ContainsKey(pair1) || !pairData[pair1].ContainsKey(steps - 1))
-            {
-                CalcPairData(pair1, steps - 1, rules, pairData);
+                result.SafeIncrement(counts.Key, counts.Value);
             }
 
-            if (!pairData.ContainsKey(pair2) || !pairData[pair2].ContainsKey(steps - 1))
-            {
-                CalcPairData(pair2, steps - 1, rules, pairData);
-            }
-
-            foreach (var i in pairData[pair1][steps - 1])
-            {
-                result.SafeIncrement(i.Key, i.Value);
-            }
-
-            foreach (var i in pairData[pair2][steps - 1])
-            {
-                result.SafeIncrement(i.Key, i.Value);
-            }
-
-            result.SafeDecrement(after[1]);
+            result.SafeDecrement(pair[0]);
         }
 
-        if (!pairData.ContainsKey(pair))
+        return result;
+    }
+
+    private Dictionary<char, long> CalcPairData(string pair, int steps)
+    {
+        if (_lookup.ContainsKey((pair, steps)))
         {
-            pairData.Add(pair, new Dictionary<int, Dictionary<char, long>>());
+            return _lookup[(pair, steps)];
         }
 
-        pairData[pair].Add(steps, result);
+        var rule = _rules[pair];
+        var result = new Dictionary<char, long>();
+
+        if (steps == 0)
+        {
+            result.SafeIncrement(pair[0]);
+            result.SafeIncrement(pair[1]);
+
+            return result;
+        }
+
+        var left = pair[0].ToString() + rule;
+        var right = rule + pair[1].ToString();
+
+        var leftCounts = CalcPairData(left, steps - 1);
+        var rightCounts = CalcPairData(right, steps - 1);
+
+        
+
+        _lookup[(left, steps - 1)] = leftCounts;
+        _lookup[(right, steps - 1)] = rightCounts;
+
+        if (leftCounts.Any(x => x.Value < 0))
+        {
+            var foo = "blah";
+        }
+
+        rightCounts.ForEach(x => leftCounts.SafeIncrement(x.Key, x.Value));
+        leftCounts.SafeDecrement(rule[0]);
+
+        if (leftCounts.Any(x => x.Value < 0))
+        {
+            var foo = "blah";
+        }
+
+        return leftCounts;
     }
 }

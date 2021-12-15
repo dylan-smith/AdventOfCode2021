@@ -169,6 +169,14 @@ namespace AdventOfCode
 
     public static class StringManipulationExtensions
     {
+        public static IEnumerable<string> WindowS(this string input, int size)
+        {
+            for (var i = size - 1; i < input.Length; i++)
+            {
+                yield return String.Join(null, input.Skip(i - size + 1).Take(size));
+            }
+        }
+
         public static StringBuilder SwapPositions(this StringBuilder source, int x, int y)
         {
             var xChar = source[x];
