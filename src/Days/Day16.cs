@@ -19,7 +19,11 @@ public class Day16 : BaseDay
 
     public override string PartTwo(string input)
     {
-        return string.Empty;
+        var binary = input.Trim().HexToBinary();
+
+        var root = new Packet(binary, Log);
+
+        return root.GetValue().ToString();
     }
 }
 
@@ -27,6 +31,7 @@ public class Packet
 {
     public int Version { get; set; }
     public string TypeID { get; set; }
+    public long LiteralValue { get; set; }
     public int TotalBits { get; set; }
     private readonly Action<string> _log;
 
@@ -108,6 +113,7 @@ public class Packet
             result += 5;
         }
 
+        LiteralValue = Convert.ToInt64(literal, 2);
         return result;
     }
 
@@ -118,5 +124,50 @@ public class Packet
         result += Children.Sum(c => c.VersionSum());
 
         return result;
+    }
+
+    public long GetValue()
+    {
+        if (TypeID == "100")
+        {
+            return LiteralValue;
+        }
+
+        if (TypeID == "000")
+        {
+            return Children.Sum(c => c.GetValue());
+        }
+
+        if (TypeID == "001")
+        {
+            return Children.Multiply(c => c.GetValue());
+        }
+
+        if (TypeID == "010")
+        {
+            return Children.Min(c => c.GetValue());
+        }
+
+        if (TypeID == "011")
+        {
+            return Children.Max(c => c.GetValue());
+        }
+
+        if (TypeID == "101")
+        {
+            return Children.First().GetValue() > Children.Last().GetValue() ? 1 : 0;
+        }
+
+        if (TypeID == "110")
+        {
+            return Children.First().GetValue() < Children.Last().GetValue() ? 1 : 0;
+        }
+
+        if (TypeID == "111")
+        {
+            return Children.First().GetValue() == Children.Last().GetValue() ? 1 : 0;
+        }
+
+        throw new Exception();
     }
 }
