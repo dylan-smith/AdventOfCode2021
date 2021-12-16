@@ -86,36 +86,7 @@ public class Day15 : BaseDay
 
     public override string PartTwo(string input)
     {
-        var lines = input.Lines().ToList();
-        var inputWidth = lines[0].Length;
-        var inputHeight = lines.Count;
-        _grid = new int[inputWidth * 5, inputHeight * 5];
-
-        for (var y = 0; y < lines.Count; y++)
-        {
-            for (var x = 0; x < lines[0].Length; x++)
-            {
-                var startValue = int.Parse(lines[y][x].ToString());
-
-                for (var i = 0; i < 5; i++)
-                {
-                    for (var j = 0; j < 5; j++)
-                    {
-                        var tileX = x + (i * inputWidth);
-                        var tileY = y + (j * inputHeight);
-
-                        var tileValue = startValue + i + j;
-
-                        if (tileValue > 9)
-                        {
-                            tileValue -= 9;
-                        }
-
-                        _grid[tileX, tileY] = tileValue;
-                    }
-                }
-            }
-        }
+        _grid = BuildExpandedGrid(input);
 
         var pos = new Point(0, 0);
 
@@ -157,5 +128,41 @@ public class Day15 : BaseDay
         }
 
         return _costs[new Point(_grid.Width() - 1, _grid.Height() - 1)].ToString();
+    }
+
+    private int[,] BuildExpandedGrid(string input)
+    {
+        var lines = input.Lines().ToList();
+        var inputWidth = lines[0].Length;
+        var inputHeight = lines.Count;
+        var result = new int[inputWidth * 5, inputHeight * 5];
+
+        for (var y = 0; y < lines.Count; y++)
+        {
+            for (var x = 0; x < lines[0].Length; x++)
+            {
+                var startValue = int.Parse(lines[y][x].ToString());
+
+                for (var i = 0; i < 5; i++)
+                {
+                    for (var j = 0; j < 5; j++)
+                    {
+                        var tileX = x + (i * inputWidth);
+                        var tileY = y + (j * inputHeight);
+
+                        var tileValue = startValue + i + j;
+
+                        if (tileValue > 9)
+                        {
+                            tileValue -= 9;
+                        }
+
+                        result[tileX, tileY] = tileValue;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }
