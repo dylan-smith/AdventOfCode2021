@@ -5,129 +5,49 @@ namespace AdventOfCode.Days;
 [Day(2021, 15)]
 public class Day15 : BaseDay
 {
-    private Dictionary<Point, long> _costs;
-    private int[,] _grid;
-    private long _maxCost = long.MaxValue;
-
     public override string PartOne(string input)
     {
-        _grid = input.CreateIntGrid();
+        var grid = input.CreateIntGrid();
+        var cost = FindPath(grid);
 
-        var pos = new Point(_grid.Width() - 1, _grid.Height() - 1);
-        _costs = new Dictionary<Point, long>();
-
-        _maxCost = GetMaxCost();
-
-        CalcCosts(pos, _grid[pos.X, pos.Y]);
-
-        return (_costs[new Point(0, 0)] - _grid[0, 0]).ToString();
-    }
-
-    private long GetMaxCost()
-    {
-        var pos = new Point(0, 0);
-        var end = new Point(_grid.Width() - 1, _grid.Height() - 1);
-        var cost = 0L;
-
-        while (pos != end)
-        {
-            var downCost = long.MaxValue;
-            var rightCost = long.MaxValue;
-
-            if ((pos.Y + 1) < _grid.Height())
-            {
-                downCost = _grid[pos.X, pos.Y + 1];
-            }
-
-            if ((pos.X + 1) < _grid.Width())
-            {
-                rightCost = _grid[pos.X + 1, pos.Y];
-            }
-
-            if (downCost <= rightCost)
-            {
-                pos = new Point(pos.X, pos.Y + 1);
-                cost += downCost;
-            }
-            else
-            {
-                pos = new Point(pos.X + 1, pos.Y);
-                cost += rightCost;
-            }
-        }
-
-        return cost;
-    }
-
-    private void CalcCosts(Point pos, long cost)
-    {
-        if (cost >= _maxCost) return;
-        if (_costs.ContainsKey(pos) && _costs[pos] <= cost) return;
-        _costs.SafeSet(pos, cost);
-
-        if (pos.X == 0 && pos.Y == 0)
-        {
-            if (cost < _maxCost)
-            {
-                base.Log($"Max Cost: {cost}");
-                _maxCost = cost;
-            }
-        }
-
-        var neighbors = _grid.GetNeighborPoints(pos).OrderBy(x => x.c + x.point.ManhattanDistance());
-
-        foreach (var n in neighbors)
-        {
-            var ncost = cost + _grid[n.point.X, n.point.Y];
-
-            CalcCosts(n.point, ncost);
-        }
+        return cost.ToString();
     }
 
     public override string PartTwo(string input)
     {
-        _grid = BuildExpandedGrid(input);
+        var grid = BuildExpandedGrid(input);
+        var cost = FindPath(grid);
 
-        var pos = new Point(0, 0);
+        return cost.ToString();
+    }
 
-        var frontier = new List<Point>();
-        _costs = new Dictionary<Point, long>();
-        _grid.GetPoints().ForEach(p => _costs.Add(p, long.MaxValue));
-        var neighbors = _grid.GetNeighborPoints(pos);
-        var cost = 0L;
+    private long FindPath(int[,] grid)
+    {
+        var costs = new Dictionary<Point, long>();
+        grid.GetPoints().ForEach(p => costs.Add(p, long.MaxValue));
 
-        foreach (var n in neighbors)
+        var frontier = new PriorityQueue<Point, long>();
+        frontier.Enqueue(new Point(0, 0), 0);
+        costs[new Point(0, 0)] = 0;
+
+        while (frontier.Count > 0)
         {
-            var ncost = cost + n.c;
+            var f = frontier.Dequeue();
+            var neighbors = grid.GetNeighborPoints(f);
 
-            if (ncost < _costs[n.point])
+            foreach (var (point, cost) in neighbors)
             {
-                _costs[n.point] = ncost;
-                frontier.Add(n.point);
-            }
-        }
+                var ncost = costs[f] + cost;
 
-        while (frontier.Any())
-        {
-            var f = frontier.WithMin(p => _costs[new Point(p.X, p.Y)]);
-            neighbors = _grid.GetNeighborPoints(f);
-            cost = _costs[f];
-
-            foreach (var n in neighbors)
-            {
-                var ncost = cost + n.c;
-
-                if (ncost < _costs[n.point])
+                if (ncost < costs[point])
                 {
-                    _costs[n.point] = ncost;
-                    frontier.Add(n.point);
+                    costs[point] = ncost;
+                    frontier.Enqueue(point, ncost);
                 }
             }
-
-            frontier.Remove(f);
         }
 
-        return _costs[new Point(_grid.Width() - 1, _grid.Height() - 1)].ToString();
+        return costs[new Point(grid.Width() - 1, grid.Height() - 1)];
     }
 
     private int[,] BuildExpandedGrid(string input)
