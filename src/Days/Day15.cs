@@ -74,7 +74,7 @@ public class Day15 : BaseDay
             }
         }
 
-        var neighbors = _grid.GetNeighborPoints(pos).OrderBy(x => x.c).ToList();
+        var neighbors = _grid.GetNeighborPoints(pos).OrderBy(x => x.c + x.point.ManhattanDistance());
 
         foreach (var n in neighbors)
         {
