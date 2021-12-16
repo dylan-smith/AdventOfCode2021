@@ -117,14 +117,45 @@ public class Day15 : BaseDay
             }
         }
 
-        var pos = new Point(_grid.Width() - 1, _grid.Height() - 1);
+        var pos = new Point(0, 0);
+
+        var frontier = new List<Point>();
         _costs = new Dictionary<Point, long>();
+        _grid.GetPoints().ForEach(p => _costs.Add(p, long.MaxValue));
+        var neighbors = _grid.GetNeighborPoints(pos);
+        var cost = 0L;
 
-        _maxCost = GetMaxCost();
-        base.Log($"Max Cost: {_maxCost}");
+        foreach (var n in neighbors)
+        {
+            var ncost = cost + n.c;
 
-        CalcCosts(pos, _grid[pos.X, pos.Y]);
+            if (ncost < _costs[n.point])
+            {
+                _costs[n.point] = ncost;
+                frontier.Add(n.point);
+            }
+        }
 
-        return (_costs[new Point(0, 0)] - _grid[0, 0]).ToString();
+        while (frontier.Any())
+        {
+            var f = frontier.WithMin(p => _costs[new Point(p.X, p.Y)]);
+            neighbors = _grid.GetNeighborPoints(f);
+            cost = _costs[f];
+
+            foreach (var n in neighbors)
+            {
+                var ncost = cost + n.c;
+
+                if (ncost < _costs[n.point])
+                {
+                    _costs[n.point] = ncost;
+                    frontier.Add(n.point);
+                }
+            }
+
+            frontier.Remove(f);
+        }
+
+        return _costs[new Point(_grid.Width() - 1, _grid.Height() - 1)].ToString();
     }
 }
