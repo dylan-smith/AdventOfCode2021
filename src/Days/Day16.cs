@@ -115,11 +115,11 @@ public class Day16 : BaseDay
         {
             return TypeID switch
             {
-                "100" => LiteralValue,
                 "000" => Children.Sum(c => c.GetValue()),
                 "001" => Children.Multiply(c => c.GetValue()),
                 "010" => Children.Min(c => c.GetValue()),
                 "011" => Children.Max(c => c.GetValue()),
+                "100" => LiteralValue,
                 "101" => Children.First().GetValue() > Children.Last().GetValue() ? 1 : 0,
                 "110" => Children.First().GetValue() < Children.Last().GetValue() ? 1 : 0,
                 "111" => Children.First().GetValue() == Children.Last().GetValue() ? 1 : 0,
