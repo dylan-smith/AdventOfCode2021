@@ -11,54 +11,19 @@ namespace AdventOfCode.Days
         private int targetYMin;
         private int targetYMax;
 
-        //private const int targetXMin = 20;
-        //private const int targetXMax = 30;
-        //private const int targetYMin = -10;
-        //private const int targetYMax = -5;
-
         public override string PartOne(string input)
         {
             ReadInput(input);
             
             var yDelta = -targetYMin - 1;
             var y = 0;
-            var steps = 0;
-            var yMax = 0;
 
-            while (y != targetYMin)
+            while (yDelta > 0)
             {
-                y += yDelta;
-                yDelta--;
-                steps++;
-
-                if (y >= yMax)
-                {
-                    yMax = y;
-                }
+                y += yDelta--;
             }
 
-            base.Log($"yMax: {yMax}");
-            base.Log($"steps: {steps}");
-
-            for (var xDelta = 1; xDelta <= targetXMax; xDelta++)
-            {
-                var delta = xDelta;
-                var x = 0;
-
-                while (x < targetXMin)
-                {
-                    x += delta;
-                    delta--;
-                }
-
-                if (x >= targetXMin && x <= targetXMax)
-                {
-                    base.Log($"xDelta: {xDelta}");
-                    break;
-                }
-            }
-
-            return yMax.ToString();
+            return y.ToString();
         }
 
         private void ReadInput(string input)
