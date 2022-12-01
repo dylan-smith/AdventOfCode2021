@@ -54,7 +54,7 @@ namespace AdventOfCode.Days
                 }
             }
 
-            base.Log($"possible count: {velocities.Count}");
+            base.Log($"possible: {velocities.Count}");
 
             return velocities.Count(v => TestVelocity(v.x, v.y)).ToString();
         }
@@ -63,22 +63,16 @@ namespace AdventOfCode.Days
         {
             var x = 0;
             var y = 0;
-            var xDelta = xVelocity;
-            var yDelta = yVelocity;
 
             while (x <= targetXMax && y >= targetYMin)
             {
-                x += xDelta;
-                y += yDelta;
+                x += xVelocity--;
+                y += yVelocity--;
 
-                xDelta--;
-                yDelta--;
-
-                xDelta = Math.Max(0, xDelta);
+                xVelocity = Math.Max(0, xVelocity);
 
                 if (IsInTarget(x, y))
                 {
-                    base.Log($"Valid: {xVelocity}, {yVelocity}");
                     return true;
                 }
             }
